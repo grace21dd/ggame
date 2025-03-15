@@ -1,187 +1,268 @@
 #include <iostream>
 #include <SDL.h>
-#include <SDL2/SDL_image.h>
+#include <cmath>
 
-#include "graphic.h"
-#include "defs.h"
-using namespace std;
+#include "Constants.h"
+#include "HelperFunctions.h"
+#include "Square.h"
+#include "Board.h"
+#include "Tile.h"
+#include "TileGenerator.h"
+#include "Timer.h"
+#include "DrawingFunctions.h"
+#include "TextDrawingFunctions.h"
 
-// const int SCREEN_WIDTH = 800;
-// const int SCREEN_HEIGHT = 600;
-// const char* WINDOW_TITLE = "Hello World!";
+//const char* WINDOW_TITLE = "My Tetris";
 
-void logErrorAndExit(const char* msg, const char* error)
+int game(bool &restart, SDL_Renderer *renderer)
 {
-    SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "%s: %s", msg, error);
-    SDL_Quit();
+	restart = false;
+	SDL_Event e;
+	bool quit = false;
+
+	clearRender(renderer);
+	renderStartMessage(renderer);
+	SDL_RenderPresent(renderer);
+
+	bool start = false;
+	while (!start) {
+		if (SDL_WaitEvent(&e) != 0) {
+			if (e.type == SDL_KEYDOWN) {
+				if (e.key.keysym.sym == SDLK_ESCAPE) {
+					quit = true;
+					start = true;
+				} else {
+					start = true;
+				}
+			} else if (e.type == SDL_QUIT) {
+				quit = true;
+				start = true;
+			}
+		}
+	}
+
+	clearRender(renderer);
+
+	Board board;
+	renderDrawNewBoard(renderer);
+
+	TileGenerator tileGenerator = TileGenerator();
+	Tile tile;
+	Tile nextTile = tileGenerator.next();
+
+	SDL_RenderPresent(renderer);
+	//SDL_UpdateWindowSurface(window);
+
+	int speed = STARTING_SPEED;
+	int score = 0;
+	int level = 1;
+	int removedLines = 0;
+	int newRemovedLines = 0;
+
+
+	Timer timer = Timer(speed);
+
+	bool canMove = false;
+	bool gameOver = false;
+	bool isPause = false;
+	bool resetScreen = false;
+	bool levelUp = false;
+	bool quitRequested = false;
+
+	while (!quit){
+		if (SDL_WaitEvent(&e) != 0){
+			resetScreen = false;
+			if (e.type == SDL_QUIT) {
+				quitRequested = true;
+			}
+			else if (e.type == timer.eventType()) {
+				newRemovedLines = 0;
+				levelUp = false;
+
+				if (isPause || gameOver);
+				else if (!canMove) {
+					canMove = true;
+					newRemovedLines = board.removeFullLines();
+					removedLines += newRemovedLines;
+
+					if (newRemovedLines == 1) score += 40 * level;
+					else if (newRemovedLines == 2) score += 100 * level;
+					else if (newRemovedLines == 3) score += 300 * level;
+					else if (newRemovedLines == 4) score += 1200 * level;
+
+					levelUp = (removedLines / 10 + 1 - level) > 0;
+					level = removedLines / 10 + 1;
+					speed = STARTING_SPEED * pow(SPEED_INCREMENT, level - 1);
+					timer.restart(speed);
+
+					tile = nextTile;
+					nextTile = tileGenerator.next();
+					if (!tile.canDraw(board)) gameOver = true;
+					tile.addToBoard(board);
+
+					resetScreen = true;
+				} else if (tile.canMoveDown(board)) {
+					tile.moveDown(board);
+					resetScreen = true;
+				} else {
+					canMove = false;
+				}
+			}
+			else if (e.type == SDL_KEYDOWN) {
+				if (e.key.keysym.sym == SDLK_ESCAPE) {
+					quitRequested = true;
+				}
+				if (e.key.keysym.sym == SDLK_p) {
+					if (isPause) { // pause()
+						isPause = false;
+						timer.restart();
+						resetScreen = true;
+					} else {		// resume()
+						isPause = true;
+						timer.stop();
+						resetScreen = true;
+					}
+				}
+				if (e.key.keysym.sym == SDLK_r) {
+					if (gameOver) {
+						restart = true;
+						quit = true;
+					}
+				}
+				if (isPause || gameOver);
+				else if (e.key.keysym.sym == SDLK_UP || e.key.keysym.sym == SDLK_w) {
+					if (canMove && tile.canRotate(board)) {
+						tile.rotate(board);
+						resetScreen = true;
+					}
+				}
+				else if (e.key.keysym.sym == SDLK_DOWN || e.key.keysym.sym == SDLK_s) {
+					if (canMove && tile.canMoveDown(board)) {
+						tile.moveDown(board);
+						score += 1;
+						resetScreen = true;
+					}
+				}
+				else if (e.key.keysym.sym == SDLK_LEFT || e.key.keysym.sym == SDLK_a) {
+					if (canMove && tile.canMoveLeft(board)) {
+						tile.moveLeft(board);
+						resetScreen = true;
+					}
+				}
+				else if (e.key.keysym.sym == SDLK_RIGHT || e.key.keysym.sym == SDLK_d) {
+					if (canMove && tile.canMoveRight(board)) {
+						tile.moveRight(board);
+						resetScreen = true;
+					}
+				}
+				else if (e.key.keysym.sym == SDLK_SPACE || e.key.keysym.sym == SDLK_RETURN) {
+					while (canMove && tile.canMoveDown(board)) {
+						tile.moveDown(board);
+						score += 2;
+						resetScreen = true;
+					}
+					canMove = false;
+				}
+			}
+
+			if (quitRequested) {
+				clearRender(renderer);
+				renderDrawNewBoard(renderer);
+				renderLeftMenu(renderer, score, level, removedLines, nextTile);
+				renderRightMenu(renderer);
+				renderQuitMessage(renderer);
+				SDL_RenderPresent(renderer);
+
+				bool keyPressed = false;
+				while (!keyPressed) {
+					if (SDL_WaitEvent(&e) != 0) {
+						if (e.type == SDL_KEYDOWN) {
+							keyPressed = true;
+							if (e.key.keysym.sym == SDLK_ESCAPE || e.key.keysym.sym == SDLK_y) {
+								quit = true;
+							}
+						}
+						if (e.type == SDL_QUIT) {
+							keyPressed = true;
+							quit = true;
+						}
+					}
+				}
+				quitRequested = false;
+				resetScreen = true;
+			}
+			if (resetScreen) {
+				clearRender(renderer);
+
+				if (gameOver) {
+					renderDrawFullBoard(renderer, board);
+					renderLeftMenu(renderer, score, level, removedLines, nextTile);
+					renderRightMenu(renderer);
+					renderGameOverMessages(renderer);
+				} else if (!isPause) {
+					renderDrawFullBoard(renderer, board);
+					renderLeftMenu(renderer, score, level, removedLines, nextTile);
+					renderRightMenu(renderer);
+					renderRemovedLinesMessage(renderer, newRemovedLines);
+					if (levelUp) renderLevelUpMessage(renderer);
+				} else {
+					renderPauseMessage(renderer);
+				}
+				SDL_RenderPresent(renderer);
+				//SDL_UpdateWindowSurface(window);
+			}
+		}
+	}
+
+	timer.stop();
+
+	return 0;
 }
 
-SDL_Window* initSDL(int SCREEN_WIDTH, int SCREEN_HEIGHT, const char* WINDOW_TITLE)
+int run()
 {
-    if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
-        logErrorAndExit("SDL_Init", SDL_GetError());
+	// Initialize everything
+	if (initEverything() != 0) return 1;
 
-    if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))
-        logErrorAndExit( "SDL_image error:", IMG_GetError());
 
-    SDL_Window* window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    //full screen
-    //window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP);
-    if (window == nullptr) logErrorAndExit("CreateWindow", SDL_GetError());
 
-    return window;
+	//SDL_Window *window = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	SDL_Window *window = SDL_CreateWindow(WINDOW_TITLE.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+//Begin: LQH
+	SDL_Surface* appIcon = IMG_Load( "paint/icon.png" );
+	SDL_SetWindowIcon(window, appIcon);
+//End: LQH
+
+	if (window == nullptr) {
+		logSDLError(std::cout, "CreateWindow");
+		SDL_Quit();
+		return 1;
+	}
+
+	SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	// SDL_Renderer *renderer = SDL_CreateSoftwareRenderer(SDL_GetWindowSurface(window));
+	if (renderer == nullptr) {
+		logSDLError(std::cout, "CreateRenderer");
+		SDL_Quit();
+		return 1;
+	}
+
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	bool restart = true;
+	while (restart)
+	{
+		if (game(restart, renderer) != 0) return 1;
+	}
+
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+	return 0;
 }
 
-SDL_Renderer* createRenderer(SDL_Window* window)
-{
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED |
-                                              SDL_RENDERER_PRESENTVSYNC);
-    if (renderer == nullptr) logErrorAndExit("CreateRenderer", SDL_GetError());
-
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-    return renderer;
-}
-
-void quitSDL(SDL_Window* window, SDL_Renderer* renderer)
-{
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    IMG_Quit();
-    SDL_Quit();
-}
-
-void waitUntilKeyPressed()
-{
-    SDL_Event e;
-    while (true) {
-        if ( SDL_PollEvent(&e) != 0 &&
-             (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) )
-            return;
-        SDL_Delay(100);
-    }
-}
-
-void drawSomething(SDL_Window* window, SDL_Renderer* renderer) {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);   // white
-    SDL_RenderDrawPoint(renderer, SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);   // red
-    SDL_RenderDrawLine(renderer, 100, 100, 200, 200);
-    SDL_Rect filled_rect;
-    filled_rect.x = SCREEN_WIDTH - 400;
-    filled_rect.y = SCREEN_HEIGHT - 150;
-    filled_rect.w = 320;
-    filled_rect.h = 100;
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // green
-    SDL_RenderFillRect(renderer, &filled_rect);
-}
-
-SDL_Texture *loadTexture(const char *filename, SDL_Renderer* renderer)
-{
-	SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,
-                     "Loading %s", filename);
-
-	SDL_Texture *texture = IMG_LoadTexture(renderer, filename);
-	if (texture == NULL) {
-        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR,
-                       "Load texture %s", IMG_GetError());
-    }
-	return texture;
-}
-
-void renderTexture(SDL_Texture *texture, int x, int y,
-                   SDL_Renderer* renderer)
-{
-	SDL_Rect dest;
-	dest.x = x;
-	dest.y = y;
-    // SDL_Rect srcRect;
-    // srcRect.x = 0;
-    // srcRect.y = 0;
-	SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
-    // SDL_Rect dstRect = {100, 100, 200, 200};
-    // SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-	SDL_RenderCopy(renderer, texture, NULL, &dest);
-}
-
-int main(int argc, char* argv[])
-{
-    //Khởi tạo môi trường đồ họa
-    // SDL_Window* window = initSDL(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
-    // SDL_Renderer* renderer = createRenderer(window);
-
-    Graphic graphic;
-    graphic.initSDL(SCREEN_WIDTH, SCREEN_HEIGHT, WINDOW_TITLE);
-    //Xóa màn hình
-    //SDL_RenderClear(renderer);
-    SDL_Event e;
-    while (true) {
-        if ( SDL_PollEvent(&e) != 0 &&
-             (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) )
-            break;
-        graphic.prepareSence();
-        // drawSomething(graphic.window, graphic.renderer);
-        SDL_Texture* mario = graphic.loadTexture("imgs/mario_bg.png");
-        int w, h;
-        SDL_QueryTexture(mario, NULL, NULL, &w, &h);
-        graphic.renderTexture(mario, 100, 100, w, h);
-        graphic.presentSence();
-        SDL_Delay(100);
-    }
-
-    //Vẽ gì đó
-
-
-    // SDL_Texture* background = loadTexture("imgs/background.png", renderer);
-    // SDL_RenderCopy( renderer, background, NULL, NULL);
-    // SDL_Rect dest;
-    // SDL_Rect src;
-    // dest.x = 100;
-    // dest.y = 100;
-    // dest.w = 100;
-    // dest.h = 100;
-    // SDL_Texture* mario = loadTexture("imgs/mario_bg.png", renderer);
-    // SDL_QueryTexture(mario, NULL, NULL, &src.w, &src.h);
-    // std::cout << src.w << " " << src.h;
-    // // double ratio = 0.5;
-    // dest = {100, 100, 100, 100};
-    // SDL_RenderCopy( renderer, mario, NULL, &dest);
-    // SDL_Texture *texture = IMG_LoadTexture(renderer, filename);
-    // SDL_QueryTexture(texture, NULL, NULL, &srcRect.w, &srcRect.h);
-    // renderTexture(mario, 100, 200, renderer);
-
-    // SDL_Surface* surface = IMG_Load("imgs/marion_white_bg.png");
-
-    // Uint32 colorkey = SDL_MapRGB(surface->format, 255, 255, 255); // Màu hồng thành trong suốt
-    // SDL_SetColorKey(surface, SDL_TRUE, colorkey);
-
-    // SDL_Texture* mario = SDL_CreateTextureFromSurface(renderer, surface);
-    // SDL_FreeSurface(surface);
-    // SDL_Rect dest;
-    // SDL_Rect src;
-    // dest.x = 100;
-    // dest.y = 100;
-    // dest.w = 500;
-    // dest.h = 500;
-    // SDL_QueryTexture(mario, NULL, NULL, &src.w, &src.h);
-    // std::cout << src.w << " " << src.h;
-    // double ratio = 0.5;
-    // dest = {100, 100, 500, 500};
-    // SDL_RenderCopy( renderer, mario, NULL, &dest);
-
-    // Render texture lên màn hình
-    // SDL_RenderCopy(renderer, mario, NULL, NULL);
-
-    //Hiện bản vẽ ra màn hình
-    //SDL_RenderPresent(renderer);
-
-
-    //Đợi phím bất kỳ trước khi đóng môi trường đồ họa và kết thúc chương trình
-    // SDL_DestroyTexture( background );
-    // background = NULL;
-
-    //quitSDL(window, renderer);
-    graphic.quitSDL();
-    return 0;
+int main(int argc, char* args[]) {
+	return run();
 }
