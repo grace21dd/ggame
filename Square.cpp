@@ -1,5 +1,5 @@
 #include <SDL.h>
-#include "Constants.h"
+#include "constant.h"
 #include "HelperFunctions.h"
 
 class Square

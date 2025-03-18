@@ -1,3 +1,65 @@
 # depslib dependency file v1.0
 1741949594 source:d:\btapp\ggame\constant.cpp
 
+1742005466 source:d:\btapp\ggame\pairofxy.cpp
+	"PairOfXY.h"
+
+1742021520 d:\btapp\ggame\pairofxy.h
+
+1742021715 source:d:\btapp\ggame\square.cpp
+	<SDL.h>
+	"constant.h"
+	"HelperFunctions.h"
+
+1742021347 d:\btapp\ggame\constant.h
+	<SDL.h>
+	<string>
+
+1742021744 d:\btapp\ggame\helperfunctions.h
+	<SDL.h>
+	<SDL_image.h>
+	<iostream>
+	<cstdlib>
+	<ctime>
+	"constant.h"
+
+1742021566 source:d:\btapp\ggame\board.cpp
+	<SDL.h>
+	"constant.h"
+	"HelperFunctions.h"
+	"Square.h"
+	<iostream>
+	"Board.h"
+
+1742021752 d:\btapp\ggame\square.h
+	<SDL.h>
+	"constant.h"
+	"HelperFunctions.h"
+
+1742021774 d:\btapp\ggame\board.h
+	<SDL.h>
+	"constant.h"
+	"HelperFunctions.h"
+	"Square.h"
+
+1742021760 source:d:\btapp\ggame\textdrawingfunctions.cpp
+	<SDL.h>
+	"Tile.h"
+	"constant.h"
+	"DrawingFunctions.h"
+
+1742021767 d:\btapp\ggame\tile.h
+	<SDL.h>
+	"constant.h"
+	"HelperFunctions.h"
+	"Square.h"
+	"Board.h"
+	"PairOfXY.h"
+
+1742021810 d:\btapp\ggame\drawingfunctions.h
+	<SDL.h>
+	"constant.h"
+	"HelperFunctions.h"
+	"Square.h"
+	"Board.h"
+

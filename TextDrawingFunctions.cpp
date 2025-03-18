@@ -1,8 +1,8 @@
 #include <SDL.h>
-#include <SDL_ttf.h>
+
 
 #include "Tile.h"
-#include "Constants.h"
+#include "constant.h"
 #include "DrawingFunctions.h"
 
 void renderTopMessage(SDL_Renderer *renderer, const std::string message, const SDL_Color color)

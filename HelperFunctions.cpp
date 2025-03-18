@@ -1,11 +1,11 @@
 #include <SDL.h>
-#include <SDL_ttf.h>
+
 #include <SDL_image.h>
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
 // #include <random>
-#include "Constants.h"
+#include "constant.h"
 
 int randInt(int n)
 {

@@ -1,7 +1,7 @@
 #include <SDL.h>
 #include <string>
 
-#include "Constants.h"
+#include "constant.h"
 #include "HelperFunctions.h"
 #include "Square.h"
 #include "Board.h"
