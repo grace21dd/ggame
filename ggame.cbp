@@ -32,6 +32,18 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Unit filename="Button.cpp" />
+		<Unit filename="Button.h" />
+		<Unit filename="Character.cpp" />
+		<Unit filename="Character.h" />
+		<Unit filename="Enemy.cpp" />
+		<Unit filename="Enemy.h" />
+		<Unit filename="Game_Base.cpp" />
+		<Unit filename="Game_Base.h" />
+		<Unit filename="Game_Utils.cpp" />
+		<Unit filename="Game_Utils.h" />
+		<Unit filename="LTexture.cpp" />
+		<Unit filename="LTexture.h" />
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />

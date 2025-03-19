@@ -63,3 +63,60 @@
 	"Square.h"
 	"Board.h"
 
+1742371661 source:d:\btapp\ggame\button.cpp
+	"Button.h"
+
+1742373390 d:\btapp\ggame\button.h
+	"Game_Base.h"
+	"LTexture.h"
+
+1742375146 d:\btapp\ggame\game_base.h
+	<SDL.h>
+	<SDL_image.h>
+	<SDL_mixer.h>
+	<SDL_ttf.h>
+	<iostream>
+	<fstream>
+	<sstream>
+	<string>
+	<vector>
+	<ctime>
+
+1742373552 d:\btapp\ggame\ltexture.h
+	"Game_Base.h"
+
+1742371630 source:d:\btapp\ggame\character.cpp
+	"Character.h"
+
+1742373423 d:\btapp\ggame\character.h
+	"LTexture.h"
+
+1742371595 source:d:\btapp\ggame\enemy.cpp
+	"Enemy.h"
+
+1742373459 d:\btapp\ggame\enemy.h
+	"LTexture.h"
+
+1742371700 source:d:\btapp\ggame\game_base.cpp
+	"Game_Base.h"
+
+1742373304 source:d:\btapp\ggame\game_utils.cpp
+	"Game_Utils.h"
+
+1742373522 d:\btapp\ggame\game_utils.h
+	"Game_Base.h"
+	"Button.h"
+	"Enemy.h"
+	"Character.h"
+
+1742373334 source:d:\btapp\ggame\ltexture.cpp
+	"LTexture.h"
+
+1742371566 source:d:\btapp\ggame\main.cpp
+	"Game_Base.h"
+	"Game_Utils.h"
+	"LTexture.h"
+	"Button.h"
+	"Character.h"
+	"Enemy.h"
+
