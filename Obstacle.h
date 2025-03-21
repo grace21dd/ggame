@@ -1,0 +1,6 @@
+#ifndef OBSTACLE_H_INCLUDED
+#define OBSTACLE_H_INCLUDED
+
+
+
+#endif // OBSTACLE_H_INCLUDED

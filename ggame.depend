@@ -88,8 +88,8 @@
 1742371630 source:d:\btapp\ggame\character.cpp
 	"Character.h"
 
-1742560982 d:\btapp\ggame\character.h
-	"LTexture.h"
+1742572350 d:\btapp\ggame\character.h
+	"GTexture.h"
 
 1742371595 source:d:\btapp\ggame\enemy.cpp
 	"Enemy.h"
@@ -112,14 +112,8 @@
 1742523278 source:d:\btapp\ggame\ltexture.cpp
 	"LTexture.h"
 
-1742527365 source:d:\btapp\ggame\main.cpp
-	"Game_Base.h"
-	"Game_Utils.h"
-	"LTexture.h"
-	"Button.h"
+1742572415 source:d:\btapp\ggame\main.cpp
 	"Character.h"
-	"Enemy.h"
-	"defs.h"
 
 1742399455 source:d:\btapp\ggame\obs.cpp
 	"Obs.h"
@@ -137,4 +131,12 @@
 	<cmath>
 
 1742560402 d:\btapp\ggame\defs.h
+
+1742571902 d:\btapp\ggame\char.h
+	"GTexture.h"
+
+1742571328 d:\btapp\ggame\gtexture.h
+	<SDL.h>
+	<SDL_image.h>
+	<string>
 

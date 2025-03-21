@@ -32,20 +32,22 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="Button.cpp" />
-		<Unit filename="Button.h" />
-		<Unit filename="Character.cpp" />
-		<Unit filename="Character.h" />
-		<Unit filename="Enemy.cpp" />
-		<Unit filename="Enemy.h" />
-		<Unit filename="Game_Base.cpp" />
-		<Unit filename="Game_Base.h" />
-		<Unit filename="Game_Utils.cpp" />
-		<Unit filename="Game_Utils.h" />
-		<Unit filename="LTexture.cpp" />
-		<Unit filename="LTexture.h" />
-		<Unit filename="Obs.cpp" />
-		<Unit filename="Obs.h">
+		<Unit filename="Character.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="Character.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="GTexture.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="GTexture.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="Obstacle.cpp">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="Obstacle.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="Up.h">
