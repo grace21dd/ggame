@@ -70,7 +70,7 @@
 	"Game_Base.h"
 	"LTexture.h"
 
-1742375146 d:\btapp\ggame\game_base.h
+1742462883 d:\btapp\ggame\game_base.h
 	<SDL.h>
 	<SDL_image.h>
 	<SDL_mixer.h>
@@ -88,7 +88,7 @@
 1742371630 source:d:\btapp\ggame\character.cpp
 	"Character.h"
 
-1742373423 d:\btapp\ggame\character.h
+1742560982 d:\btapp\ggame\character.h
 	"LTexture.h"
 
 1742371595 source:d:\btapp\ggame\enemy.cpp
@@ -109,14 +109,32 @@
 	"Enemy.h"
 	"Character.h"
 
-1742373334 source:d:\btapp\ggame\ltexture.cpp
+1742523278 source:d:\btapp\ggame\ltexture.cpp
 	"LTexture.h"
 
-1742371566 source:d:\btapp\ggame\main.cpp
+1742527365 source:d:\btapp\ggame\main.cpp
 	"Game_Base.h"
 	"Game_Utils.h"
 	"LTexture.h"
 	"Button.h"
 	"Character.h"
 	"Enemy.h"
+	"defs.h"
+
+1742399455 source:d:\btapp\ggame\obs.cpp
+	"Obs.h"
+
+1742396513 d:\btapp\ggame\obs.h
+	<SDL.h>
+
+1742462139 source:d:\btapp\ggame\test.cpp
+	<SDL.h>
+	<SDL_image.h>
+	<iostream>
+	<vector>
+	<cstdlib>
+	<ctime>
+	<cmath>
+
+1742560402 d:\btapp\ggame\defs.h
 

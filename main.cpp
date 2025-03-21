@@ -4,7 +4,7 @@
 #include "Button.h"
 #include "Character.h"
 #include "Enemy.h"
-
+#include "defs.h"
 const std::string LAYER[BACKGROUND_LAYER] = {
 	"imgs/background/layer01.png",
 	"imgs/background/layer02.png",
@@ -26,6 +26,7 @@ Mix_Music* gMenuMusic = nullptr;
 Mix_Chunk* gClick = nullptr;
 Mix_Chunk* gJump = nullptr;
 Mix_Chunk* gLose = nullptr;
+
 
 SDL_Rect gPlayButton[BUTTON_TOTAL];
 SDL_Rect gHelpButton[BUTTON_TOTAL];
@@ -370,7 +371,7 @@ bool LoadMedia()
 				success = false;
 			}
 
-			if (!gPlayButtonTexture.LoadFromFile("imgs/button/big_button/play_button.png", gRenderer))
+			if (!gPlayButtonTexture.LoadFromFile("imgs/button/play_button.png", gRenderer))
 			{
 				std::cout << "Failed to load play_button image" << std::endl;
 				success = false;
@@ -386,7 +387,7 @@ bool LoadMedia()
 				}
 			}
 
-			if (!gHelpButtonTexture.LoadFromFile("imgs/button/big_button/help_button.png", gRenderer))
+			if (!gHelpButtonTexture.LoadFromFile("imgs/button/help_button.png", gRenderer))
 			{
 				std::cout << "Failed to load help_button image" << std::endl;
 				success = false;
@@ -402,7 +403,7 @@ bool LoadMedia()
 				}
 			}
 
-			if (!gBackButtonTexture.LoadFromFile("imgs/button/big_button/back_button.png", gRenderer))
+			if (!gBackButtonTexture.LoadFromFile("imgs/button/back_button.png", gRenderer))
 			{
 				std::cout << "Failed to load back_button image" << std::endl;
 				success = false;
@@ -418,7 +419,7 @@ bool LoadMedia()
 				}
 			}
 
-			if (!gExitButtonTexture.LoadFromFile("imgs/button/big_button/exit_button.png", gRenderer))
+			if (!gExitButtonTexture.LoadFromFile("imgs/button/exit_button.png", gRenderer))
 			{
 				std::cout << "Failed to load exit_button image" << std::endl;
 				success = false;
@@ -434,7 +435,7 @@ bool LoadMedia()
 				}
 			}
 
-			if (!gPauseButtonTexture.LoadFromFile("imgs/button/big_button/pause_button.png", gRenderer))
+			if (!gPauseButtonTexture.LoadFromFile("imgs/button/pause_button.png", gRenderer))
 			{
 				std::cout << "Failed to load pause_button image " << std::endl;
 				success = false;
@@ -450,7 +451,7 @@ bool LoadMedia()
 				}
 			}
 
-			if (!gContinueButtonTexture.LoadFromFile("imgs/button/big_button/continue_button.png", gRenderer))
+			if (!gContinueButtonTexture.LoadFromFile("imgs/button/continue_button.png", gRenderer))
 			{
 				std::cout << "Failed to load continue_button image " << std::endl;
 				success = false;
