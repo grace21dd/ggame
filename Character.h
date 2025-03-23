@@ -1,21 +1,23 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
 
-#include "GTexture.h"
+#include <SDL.h>
+#include "gtexture.h"
 
 class Character {
 public:
-    Character();
-    void HandleEvent(SDL_Event& e);
-    void Move();
-    void Render(SDL_Renderer* renderer);
-    bool LoadTexture(std::string path, SDL_Renderer* renderer);
+    Character(SDL_Renderer* renderer, const std::string& texturePath, int x, int y, int width, int height);
+    ~Character();
+
+    void render();
+    void update();
 
 private:
-    int posX, posY;
-    int velocityY;
-    bool isJumping;
     GTexture texture;
+    int x, y;
+    int width, height;
+    int frame;
+    SDL_Renderer* renderer;
 };
 
 #endif

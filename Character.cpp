@@ -1,38 +1,22 @@
-#include "Character.h"
+#include "character.h"
 
-const int GROUND = 300;
-const int JUMP_HEIGHT = 150;
-const int GRAVITY = 5;
-const int JUMP_SPEED = -20;
-
-Character::Character() {
-    posX = 50;
-    posY = GROUND;
-    velocityY = 0;
-    isJumping = false;
+Character::Character(SDL_Renderer* renderer, const std::string& texturePath, int x, int y, int width, int height)
+    : x(x), y(y), width(width), height(height), frame(0), renderer(renderer), texture(renderer) {
+    texture.loadFromFile(texturePath);
 }
 
-bool Character::LoadTexture(std::string path, SDL_Renderer* renderer) {
-    return texture.LoadFromFile(path, renderer);
+Character::~Character() {}
+
+void Character::render() {
+    SDL_Rect clip = {frame * width, 0, width, height};
+    texture.render(x, y, &clip);
 }
 
-void Character::HandleEvent(SDL_Event& e) {
-    if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE && !isJumping) {
-        velocityY = JUMP_SPEED;
-        isJumping = true;
+void Character::update() {
+    frame = (frame + 1) % 3;
+    x += 2;
+
+     if (x > 640) {
+        x = -64;
     }
-}
-
-void Character::Move() {
-    posY += velocityY;
-    velocityY += GRAVITY;
-
-    if (posY >= GROUND) {
-        posY = GROUND;
-        isJumping = false;
-    }
-}
-
-void Character::Render(SDL_Renderer* renderer) {
-    texture.Render(posX, posY, renderer);
 }
