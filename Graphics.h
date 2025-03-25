@@ -20,6 +20,8 @@ struct Graphics {
             logErrorAndExit("SDL_Init", SDL_GetError());
 
         window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        //full screen
+        //window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP);
         if (window == nullptr) logErrorAndExit("CreateWindow", SDL_GetError());
 
         if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))
@@ -27,6 +29,8 @@ struct Graphics {
 
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED |
                                               SDL_RENDERER_PRESENTVSYNC);
+        //Khi chạy trong máy ảo (ví dụ phòng máy ở trường)
+        //renderer = SDL_CreateSoftwareRenderer(SDL_GetWindowSurface(window));
 
         if (renderer == nullptr) logErrorAndExit("CreateRenderer", SDL_GetError());
 
