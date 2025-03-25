@@ -11,8 +11,9 @@ void Graphics::logErrorAndExit(const char* msg, const char* error)
     SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, "%s: %s", msg, error);
     SDL_Quit();
 }
-
-void Graphics::init() {
+////
+void Graphics::init()
+{
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
         logErrorAndExit("SDL_Init", SDL_GetError());
 
