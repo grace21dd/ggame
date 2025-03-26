@@ -113,10 +113,11 @@
 1742523278 source:d:\btapp\ggame\ltexture.cpp
 	"LTexture.h"
 
-1742962932 source:d:\btapp\ggame\main.cpp
+1743003196 source:d:\btapp\ggame\main.cpp
 	<iostream>
 	<SDL.h>
 	<SDL_image.h>
+	<SDL_ttf.h>
 	"graphics.h"
 	"defs.h"
 
@@ -135,7 +136,7 @@
 	<ctime>
 	<cmath>
 
-1742963143 d:\btapp\ggame\defs.h
+1742963326 d:\btapp\ggame\defs.h
 
 1742571902 d:\btapp\ggame\char.h
 	"GTexture.h"
@@ -146,9 +147,9 @@
 
 1742639149 source:d:\btapp\ggame\graphics.cpp
 
-1742962887 d:\btapp\ggame\graphics.h
+1743003182 d:\btapp\ggame\graphics.h
 	<SDL.h>
 	<SDL_image.h>
+	<SDL_ttf.h>
 	"defs.h"
-	<vector>
 

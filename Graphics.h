@@ -4,23 +4,6 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "defs.h"
-#include <vector>
-
-struct ScrollingBackground {
-    SDL_Texture* texture;
-    int scrollingOffset = 0;
-    int width, height;
-
-    void setTexture(SDL_Texture* _texture) {
-        texture = _texture;
-        SDL_QueryTexture(texture, NULL, NULL, &width, &height);
-    }
-
-    void scroll(int distance) {
-        scrollingOffset -= distance;
-        if( scrollingOffset < 0 ) { scrollingOffset = width; }
-    }
-};
 
 struct Graphics {
     SDL_Renderer *renderer;
@@ -55,10 +38,16 @@ struct Graphics {
         SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
-	void prepareScene(SDL_Texture * background = nullptr)
+    void prepareScene()
+    {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+    }
+
+	void prepareScene(SDL_Texture * background)
     {
         SDL_RenderClear(renderer);
-        if (background != nullptr) SDL_RenderCopy( renderer, background, NULL, NULL);
+        SDL_RenderCopy( renderer, background, NULL, NULL);
     }
 
     void presentScene()
@@ -107,11 +96,6 @@ struct Graphics {
         SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
         SDL_Quit();
-    }
-
-    void render(const ScrollingBackground& background) {
-        renderTexture(background.texture, background.scrollingOffset, 0);
-        renderTexture(background.texture, background.scrollingOffset - background.width, 0);
     }
 };
 
