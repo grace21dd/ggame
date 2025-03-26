@@ -44,7 +44,6 @@
 		<Unit filename="GTexture.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="Graphics.cpp" />
 		<Unit filename="Graphics.h" />
 		<Unit filename="Obstacle.cpp">
 			<Option target="&lt;{~None~}&gt;" />
