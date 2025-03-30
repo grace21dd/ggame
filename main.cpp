@@ -3,43 +3,95 @@
 #include <SDL_image.h>
 #include "graphics.h"
 #include "defs.h"
-#include "game.h"
+#include<SDL_mixer.h>
 
+#include <vector>
+//const char* WINDOW_TITLE = "Hello World!";
 using namespace std;
+void waitUntilKeyPressed()
+{
+    SDL_Event e;
+    while (true) {
+        if ( SDL_PollEvent(&e) != 0 &&
+             (e.type == SDL_KEYDOWN || e.type == SDL_QUIT) )
+            return;
+        SDL_Delay(100);
+    }
+}
 
 int main(int argc, char *argv[])
 {
     Graphics graphics;
     graphics.init();
 
-    Mouse mouse(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-    Cheese cheese(100, 100);
+    ScrollingBackground background;
+    background.setTexture(graphics.loadTexture(BACKGROUND_IMG));
 
-    bool quit = false;
-    SDL_Event event;
-    while (!quit && !gameOver(mouse)) {
-        graphics.prepareScene();
+    Sprite bird;
+    SDL_Texture* birdTexture = graphics.loadTexture("img//dino.png");
+    bird.init(birdTexture, BIRD_FRAMES, BIRD_CLIPS);
+    ////////////
+    Mix_Music *gMusic = graphics.loadMusic("music\\running.mp3");
+    graphics.play(gMusic);
 
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) quit = true;
-        }
+    Mix_Chunk *gJump = graphics.loadSound("music\\jump.wav");
 
-        const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 
-        if (currentKeyStates[SDL_SCANCODE_UP]) mouse.turnNorth();
-        if (currentKeyStates[SDL_SCANCODE_DOWN]) mouse.turnSouth();
-        if (currentKeyStates[SDL_SCANCODE_LEFT]) mouse.turnWest();
-        if (currentKeyStates[SDL_SCANCODE_RIGHT]) mouse.turnEast();
+   bool quit = false;
+SDL_Event e;
 
-        mouse.move();
-        if (mouse.canEat(cheese)) mouse.grow();
+ObstacleManager obstacleManager;
+SDL_Texture* enemyTexture = graphics.loadTexture("img/tree.png");
 
-        render(mouse, graphics);
-        render(cheese, graphics);
+Uint32 lastSpawnTime = 0;
+const Uint32 spawnInterval = 400; // Cứ 400ms sinh một nhóm xương rồng
 
-        graphics.presentScene();
-        SDL_Delay(10);
+while (!quit) {
+    while (SDL_PollEvent(&e) != 0) {
+        if (e.type == SDL_QUIT) quit = true;
     }
+
+    const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+
+
+        if (currentKeyStates[SDL_SCANCODE_UP]) cerr << " Up";
+        if (currentKeyStates[SDL_SCANCODE_DOWN]) cerr << " Down";
+        if (currentKeyStates[SDL_SCANCODE_LEFT]) cerr << " Left";
+        if (currentKeyStates[SDL_SCANCODE_RIGHT]) cerr << " Right";
+        if (currentKeyStates[SDL_SCANCODE_UP]) graphics.play(gJump);
+    background.scroll(8);
+    bird.tick();
+
+
+
+    // Xóa màn hình và vẽ lại
+    graphics.prepareScene();
+    graphics.render(background);
+    graphics.render(200, 382, bird);
+    //obstacleManager.render(graphics.renderer);
+
+    graphics.presentScene();
+
+    SDL_Delay(100); // Tốc độ khoảng 60 FPS (1000ms / 60 ≈ 16ms)
+}
+
+ if (gMusic != nullptr) Mix_FreeMusic( gMusic );
+    if (gJump != nullptr) Mix_FreeChunk( gJump);
+
+
+
+// Giải phóng tài nguyên
+SDL_DestroyTexture(enemyTexture);
+
+// Giải phóng tài nguyên
+SDL_DestroyTexture(enemyTexture);
+
+
+
+
+
+    SDL_DestroyTexture( background.texture );
+	SDL_DestroyTexture( birdTexture ); birdTexture = nullptr;
 
     graphics.quit();
     return 0;

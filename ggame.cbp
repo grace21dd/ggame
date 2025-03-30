@@ -32,30 +32,10 @@
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
-		<Unit filename="Character.cpp">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="Character.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="GTexture.cpp">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="GTexture.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="Graphics.h" />
-		<Unit filename="Obstacle.cpp">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="Obstacle.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
-		<Unit filename="Up.h">
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="defs.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="obstacle.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>
