@@ -34,10 +34,6 @@ int main(int argc, char *argv[])
     Graphics graphics;
     graphics.init();
     ObstacleManager obstacleManager;
-   // Game game;
-   // game.init(graphics);
-
-   // SDL_Renderer* renderer = graphics.getRenderer();
 
     ScrollingBackground background;
     background.setTexture(graphics.loadTexture(BACKGROUND_IMG));
@@ -52,7 +48,7 @@ int main(int argc, char *argv[])
     Mix_Chunk *gJump = graphics.loadSound("music\\jump.wav");
 
 
-   bool quit = false;
+bool quit = false;
 SDL_Event e;
 int spawnCounter = 0;
 
@@ -62,10 +58,10 @@ bool isGameOver = false;
 Uint32 lastSpawnTime = 0;
 const Uint32 spawnInterval = 400;
  SDL_Texture* menuBackground = graphics.loadTexture("img//run.png");
-// Load hình ảnh xương rồng
+
 SDL_Texture* obsTexture = graphics.loadTexture("img//obs.png");
 
-TTF_Font* font = TTF_OpenFont("assets//fontpu.ttf", 30); // Đường dẫn đến font chữ
+TTF_Font* font = TTF_OpenFont("assets//fontpu.ttf", 30);
 
 if (!font) {
     SDL_Log("Failed to load font: %s", TTF_GetError());
@@ -80,7 +76,7 @@ while (!quit) {
     while (SDL_PollEvent(&e) != 0) {
         if (e.type == SDL_QUIT) quit = true;
 
-        // Xử lý click trong menu
+        // click menu
         if (gameState == MENU && e.type == SDL_MOUSEBUTTONDOWN) {
             int x = e.button.x, y = e.button.y;
             if (x >= START_BUTTON_X && x <= START_BUTTON_X + START_BUTTON_WIDTH &&
@@ -93,7 +89,7 @@ while (!quit) {
             }
         }
 
-        // Xử lý phím nhảy
+
         if (gameState == PLAYING) {
             dino.handleInput(e);
         }
@@ -106,7 +102,7 @@ while (!quit) {
     }
     else if (gameState == PLAYING) {
 
-    score += 1;  // Hoặc dựa vào điều kiện khác, như vượt qua chướng ngại vật
+    score += 1;
 
         graphics.prepareScene();
 
@@ -121,7 +117,7 @@ while (!quit) {
 
         obstacleManager.update(obsTexture, dinoRect, gameState, isGameOver);
 
-SDL_Color scoreColor = {75, 0, 130, 255}; // Xanh tím than
+SDL_Color scoreColor = {75, 0, 130, 255};
 string scoreText = "Score: " + to_string(score);
 graphics.renderText(scoreText.c_str(), 700, 20, scoreColor, font);
 string highScoreText = "Highest: " + to_string(highest);
@@ -146,7 +142,7 @@ graphics.presentScene();
     graphics.presentScene();
 
     bool waitingForInput = true;
-    while (waitingForInput) {  // Chỉ thoát khi nhận ENTER hoặc ESC
+    while (waitingForInput) {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT) {
                 quit = true;
@@ -154,14 +150,14 @@ graphics.presentScene();
             }
             if (e.type == SDL_KEYDOWN) {
                 std::cout << "Key pressed: " << SDL_GetKeyName(e.key.keysym.sym) << std::endl;
-                if (e.key.keysym.sym == SDLK_RETURN) { // ENTER để chơi lại
+                if (e.key.keysym.sym == SDLK_RETURN) {
                     isGameOver = false;
                     gameState = PLAYING;
                     score = 0;
                     obstacleManager.clear();
                     waitingForInput = false;
                 }
-                if (e.key.keysym.sym == SDLK_ESCAPE) { // ESC để thoát
+                if (e.key.keysym.sym == SDLK_ESCAPE) {
                     quit = true;
                     waitingForInput = false;
                 }
@@ -172,7 +168,7 @@ graphics.presentScene();
 }
 if (isGameOver) {
     if (score > highest) {
-        highest = score; // Lưu điểm cao nhất
+        highest = score;
     }
 }
 
@@ -187,14 +183,7 @@ graphics.presentScene();
 
 
 
-// Giải phóng tài nguyên
 SDL_DestroyTexture(obsTexture);
-
-// Giải phóng tài nguyên
-SDL_DestroyTexture(obsTexture);
-
-
-
 
 
     SDL_DestroyTexture( background.texture );

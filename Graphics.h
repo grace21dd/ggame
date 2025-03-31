@@ -33,9 +33,10 @@ struct Obstacle {
 
 class ObstacleManager {
     std::vector<Obstacle> obstacles;
-    Uint32 lastSpawnTime = 0;
-    const Uint32 minSpawnInterval = 1500;  // Xuất hiện cách nhau ít nhất 500ms
-    const Uint32 maxSpawnInterval = 3000; // Tối đa 2 giây
+     Uint32 lastSpawnTime = 0;
+     Uint32 nextSpawnTime = 1000 + rand() % 3500;
+    const Uint32 minSpawnInterval = 1500;
+    const Uint32 maxSpawnInterval = 3500;
 
 public:
      bool checkCollision(const SDL_Rect& a, const SDL_Rect& b) {
@@ -45,33 +46,35 @@ public:
                 a.y + a.h > b.y);
     }
     void addObstacle(SDL_Texture* texture) {
-        int cactusWidth = 40;
-        int cactusHeight = 60;
-        int x = SCREEN_WIDTH; // Xuất hiện ngoài màn hình
-        int y = 406 ; // Đặt ở mặt đất
+        int obsWidth = 40;
+        int obsHeight = 60;
+        int x = SCREEN_WIDTH;
+        int y = 406 ;
 
-        obstacles.emplace_back(texture, x, y, cactusWidth, cactusHeight, 7);
-        lastSpawnTime = SDL_GetTicks(); // Lưu thời gian xuất hiện
+        obstacles.emplace_back(texture, x, y, obsWidth, obsHeight, 7);
+        lastSpawnTime = SDL_GetTicks();
     }
 
 
-    void update(SDL_Texture* texture, const SDL_Rect& dinoRect, GameState& gameState, bool& isGameOver) {
+
+
+void update(SDL_Texture* texture, const SDL_Rect& dinoRect, GameState& gameState, bool& isGameOver) {
     for (auto& obs : obstacles) {
         obs.update();
         if (checkCollision(dinoRect, obs.rect)) {
-            gameState = END; // Chuyển trạng thái sang END khi va chạm
+            gameState = END;
             isGameOver = true;
             return;
         }
     }
-
-    // Xóa các chướng ngại vật đã ra khỏi màn hình
     obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(),
                     [](const Obstacle& obs) { return obs.isOffScreen(); }), obstacles.end());
 
-    // Tạo xương rồng ngẫu nhiên
-    if (rand() % 100 < 3) {
+    Uint32 currentTime = SDL_GetTicks();
+    if (currentTime - lastSpawnTime >= nextSpawnTime) {
         addObstacle(texture);
+        lastSpawnTime = currentTime;
+        nextSpawnTime = 2000 + rand() % 4000;
     }
 }
 
@@ -81,7 +84,7 @@ public:
         }
     }
     void clear() {
-    obstacles.clear(); // Xoá toàn bộ chướng ngại vật
+    obstacles.clear();
 }
 
 };
@@ -126,14 +129,14 @@ struct Sprite {
     void tick() {
         currentFrame = (currentFrame + 1) % clips.size();
         if (isJumping) {
-            dinoY += jumpVelocity;  // Di chuyển khủng long theo vận tốc
-            jumpVelocity += 5;  // Trọng lực kéo xuống
+            dinoY += jumpVelocity;
+            jumpVelocity += 5;
 
             if (dinoY <= maxJumpHeight) {
             dinoY = maxJumpHeight;
-            jumpVelocity = 0;  // Dừng lại khi đạt đỉnh
+            jumpVelocity = 0;
         }
-            // Khi chạm đất, reset trạng thái nhảy
+
             if (dinoY >= 395) {
                 dinoY = 395;
                 isJumping = false;
@@ -142,9 +145,9 @@ struct Sprite {
     }
     void handleInput(SDL_Event& e) {
     if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE) {
-        if (!isJumping) {  // Chỉ nhảy nếu không đang ở trên không
+        if (!isJumping) {
             isJumping = true;
-            jumpVelocity = -35;  // Nhảy lên với vận tốc ban đầu
+            jumpVelocity = -33;
         }
     }
 }
@@ -171,8 +174,7 @@ struct Graphics
             logErrorAndExit("SDL_Init", SDL_GetError());
 
         window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        //full screen
-        //window = SDL_CreateWindow(WINDOW_TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
         if (window == nullptr) logErrorAndExit("CreateWindow", SDL_GetError());
 
         if (!IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG))
@@ -180,8 +182,7 @@ struct Graphics
 
         renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED |
                                               SDL_RENDERER_PRESENTVSYNC);
-        //Khi chạy trong máy ảo (ví dụ phòng máy ở trường)
-        //renderer = SDL_CreateSoftwareRenderer(SDL_GetWindowSurface(window));
+
 
         if (renderer == nullptr) logErrorAndExit("CreateRenderer", SDL_GetError());
 

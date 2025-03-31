@@ -17,10 +17,10 @@ const int EXIT_BUTTON_HEIGHT = 56;
 const int OBS_SPEED = 5;
 #define BACKGROUND_IMG "img\\play.png"
 enum GameState {
-    MENU,      // Màn hình chính
-    PLAYING,   // Đang chơi game
-    END, // Kết thúc game
-    EXIT       // Thoát game
+    MENU,
+    PLAYING,
+    END,
+    EXIT
 };
 
 const int DINO_CLIPS[][4] = {
