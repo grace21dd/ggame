@@ -1,13 +1,12 @@
 #ifndef _GRAPHICS__H
 #define _GRAPHICS__H
-
 #include <SDL.h>
 #include <SDL_image.h>
 #include "defs.h"
 #include <vector>
 #include<algorithm>
 #include<SDL_mixer.h>
-const char* WINDOW_TITLE = "Hello";
+#include<SDL_ttf.h>
 struct Obstacle {
     SDL_Texture* texture;
     SDL_Rect rect;
@@ -31,33 +30,62 @@ struct Obstacle {
     }
 };
 
+
 class ObstacleManager {
     std::vector<Obstacle> obstacles;
+    Uint32 lastSpawnTime = 0;
+    const Uint32 minSpawnInterval = 1500;  // Xuất hiện cách nhau ít nhất 500ms
+    const Uint32 maxSpawnInterval = 3000; // Tối đa 2 giây
 
 public:
+     bool checkCollision(const SDL_Rect& a, const SDL_Rect& b) {
+        return (a.x < b.x + b.w &&
+                a.x + a.w > b.x &&
+                a.y < b.y + b.h &&
+                a.y + a.h > b.y);
+    }
     void addObstacle(SDL_Texture* texture) {
-        int cactusHeight = 40 + rand() % 20;
-        obstacles.emplace_back(texture, SCREEN_WIDTH, 380 - cactusHeight, 20, cactusHeight, 7);
+        int cactusWidth = 40;
+        int cactusHeight = 60;
+        int x = SCREEN_WIDTH; // Xuất hiện ngoài màn hình
+        int y = 406 ; // Đặt ở mặt đất
+
+        obstacles.emplace_back(texture, x, y, cactusWidth, cactusHeight, 7);
+        lastSpawnTime = SDL_GetTicks(); // Lưu thời gian xuất hiện
     }
 
-    void update(SDL_Texture* texture) {
-        for (auto& obs : obstacles) {
-            obs.update();
-        }
-        obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(),
-                        [](const Obstacle& obs) { return obs.isOffScreen(); }), obstacles.end());
 
-        if (rand() % 100 < 5) { // 5% cơ hội xuất hiện chướng ngại vật mới
-            addObstacle(texture);
+    void update(SDL_Texture* texture, const SDL_Rect& dinoRect, GameState& gameState, bool& isGameOver) {
+    for (auto& obs : obstacles) {
+        obs.update();
+        if (checkCollision(dinoRect, obs.rect)) {
+            gameState = END; // Chuyển trạng thái sang END khi va chạm
+            isGameOver = true;
+            return;
         }
     }
+
+    // Xóa các chướng ngại vật đã ra khỏi màn hình
+    obstacles.erase(std::remove_if(obstacles.begin(), obstacles.end(),
+                    [](const Obstacle& obs) { return obs.isOffScreen(); }), obstacles.end());
+
+    // Tạo xương rồng ngẫu nhiên
+    if (rand() % 100 < 3) {
+        addObstacle(texture);
+    }
+}
 
     void render(SDL_Renderer* renderer) {
         for (auto& obs : obstacles) {
             obs.render(renderer);
         }
     }
+    void clear() {
+    obstacles.clear(); // Xoá toàn bộ chướng ngại vật
+}
+
 };
+
 struct ScrollingBackground {
     SDL_Texture* texture;
     int scrollingOffset = 0;
@@ -75,6 +103,10 @@ struct ScrollingBackground {
 };
 
 struct Sprite {
+    bool isJumping = false;
+    int jumpVelocity = 0;
+    int dinoY = 395;
+    const int maxJumpHeight = 100;
     SDL_Texture* texture;
     std::vector<SDL_Rect> clips;
     int currentFrame = 0;
@@ -93,16 +125,40 @@ struct Sprite {
     }
     void tick() {
         currentFrame = (currentFrame + 1) % clips.size();
+        if (isJumping) {
+            dinoY += jumpVelocity;  // Di chuyển khủng long theo vận tốc
+            jumpVelocity += 5;  // Trọng lực kéo xuống
+
+            if (dinoY <= maxJumpHeight) {
+            dinoY = maxJumpHeight;
+            jumpVelocity = 0;  // Dừng lại khi đạt đỉnh
+        }
+            // Khi chạm đất, reset trạng thái nhảy
+            if (dinoY >= 395) {
+                dinoY = 395;
+                isJumping = false;
+            }
+        }
     }
+    void handleInput(SDL_Event& e) {
+    if (e.type == SDL_KEYDOWN && e.key.keysym.sym == SDLK_SPACE) {
+        if (!isJumping) {  // Chỉ nhảy nếu không đang ở trên không
+            isJumping = true;
+            jumpVelocity = -35;  // Nhảy lên với vận tốc ban đầu
+        }
+    }
+}
 
     const SDL_Rect* getCurrentClip() const {
         return &(clips[currentFrame]);
     }
 };
-
-struct Graphics {
+struct Graphics
+{
     SDL_Renderer *renderer;
 	SDL_Window *window;
+
+	const char* WINDOW_TITLE ="run crazy";
 
 	void logErrorAndExit(const char* msg, const char* error)
     {
@@ -110,7 +166,7 @@ struct Graphics {
         SDL_Quit();
     }
 
-	void init() {
+	void init(){
         if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
             logErrorAndExit("SDL_Init", SDL_GetError());
 
@@ -148,7 +204,7 @@ struct Graphics {
         SDL_RenderPresent(renderer);
     }
 
-    SDL_Texture *loadTexture(const char *filename)
+    SDL_Texture* loadTexture(const char *filename)
     {
         SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, "Loading %s", filename);
 
@@ -170,7 +226,8 @@ struct Graphics {
         SDL_RenderCopy(renderer, texture, NULL, &dest);
     }
 
-    void blitRect(SDL_Texture *texture, SDL_Rect *src, int x, int y)
+   void blitRect(SDL_Texture *texture, SDL_Rect *src, int x, int y)
+
     {
         SDL_Rect dest;
 
@@ -191,17 +248,17 @@ struct Graphics {
         SDL_Quit();
     }
 
-    void render(int x, int y, const Sprite& sprite) {
+     void render(int x, int y, const Sprite& sprite) {
         const SDL_Rect* clip = sprite.getCurrentClip();
         SDL_Rect renderQuad = {x, y, clip->w, clip->h};
         SDL_RenderCopy(renderer, sprite.texture, clip, &renderQuad);
     }
-    void render(const ScrollingBackground& background) {
+     void render(const ScrollingBackground& background) {
         renderTexture(background.texture, background.scrollingOffset, 0);
         renderTexture(background.texture, background.scrollingOffset - background.width, 0);
     }
 ///////////////////
-    Mix_Music *loadMusic(const char* path)
+    Mix_Music* loadMusic(const char* path)
     {
         Mix_Music *gMusic = Mix_LoadMUS(path);
         if (gMusic == nullptr) {
@@ -210,7 +267,7 @@ struct Graphics {
         }
         return gMusic;
     }
-    void play(Mix_Music *gMusic)
+     void play(Mix_Music *gMusic)
     {
         if (gMusic == nullptr) return;
 
@@ -229,12 +286,49 @@ struct Graphics {
                        "Could not load sound! SDL_mixer Error: %s", Mix_GetError());
         }
     }
-    void play(Mix_Chunk* gChunk) {
+     void play(Mix_Chunk* gChunk) {
         if (gChunk != nullptr) {
             Mix_PlayChannel( -1, gChunk, 0 );
         }
     }
+
+
+void renderText(const char* text, int x, int y, SDL_Color color, TTF_Font* font) {
+    SDL_Surface* textSurface = TTF_RenderText_Solid(font, text, color);
+    if (textSurface == nullptr) return;
+
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+    SDL_Rect textRect = {x, y, textSurface->w, textSurface->h};
+
+    SDL_FreeSurface(textSurface);
+    SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
+    SDL_DestroyTexture(textTexture);
+}
+void waitForRestartOrExit(bool& quit, GameState& gameState, bool& isGameOver, ObstacleManager& obstacleManager) {
+    SDL_Event e;
+    while (true) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+                return;
+            }
+            if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_SPACE) {
+                    isGameOver = false;
+                    gameState = PLAYING;
+                    obstacleManager.clear();
+                    return;
+                }
+                if (e.key.keysym.sym == SDLK_ESCAPE) {
+                    quit = true;
+                    return;
+                }
+            }
+        }
+    }
+}
+
+
 };
 
-
-#endif // _GRAPHICS__H
+#endif

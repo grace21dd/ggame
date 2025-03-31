@@ -4,10 +4,13 @@
 #include "graphics.h"
 #include "defs.h"
 #include<SDL_mixer.h>
-
+#include<SDL_ttf.h>
 #include <vector>
-//const char* WINDOW_TITLE = "Hello World!";
+
+
 using namespace std;
+
+
 void waitUntilKeyPressed()
 {
     SDL_Event e;
@@ -21,15 +24,27 @@ void waitUntilKeyPressed()
 
 int main(int argc, char *argv[])
 {
+    SDL_Init(SDL_INIT_VIDEO);
+    GameState gameState = MENU;
+
+    if (TTF_Init() == -1) {
+    SDL_Log("Failed to initialize SDL_ttf: %s", TTF_GetError());
+}
+
     Graphics graphics;
     graphics.init();
+    ObstacleManager obstacleManager;
+   // Game game;
+   // game.init(graphics);
+
+   // SDL_Renderer* renderer = graphics.getRenderer();
 
     ScrollingBackground background;
     background.setTexture(graphics.loadTexture(BACKGROUND_IMG));
 
-    Sprite bird;
-    SDL_Texture* birdTexture = graphics.loadTexture("img//dino.png");
-    bird.init(birdTexture, BIRD_FRAMES, BIRD_CLIPS);
+    Sprite dino;
+    SDL_Texture* dinoTexture = graphics.loadTexture("img//dino.png");
+    dino.init(dinoTexture, DINO_FRAMES, DINO_CLIPS);
     ////////////
     Mix_Music *gMusic = graphics.loadMusic("music\\running.mp3");
     graphics.play(gMusic);
@@ -39,41 +54,133 @@ int main(int argc, char *argv[])
 
    bool quit = false;
 SDL_Event e;
+int spawnCounter = 0;
 
-ObstacleManager obstacleManager;
-SDL_Texture* enemyTexture = graphics.loadTexture("img/tree.png");
+
+bool isGameOver = false;
 
 Uint32 lastSpawnTime = 0;
-const Uint32 spawnInterval = 400; // Cứ 400ms sinh một nhóm xương rồng
+const Uint32 spawnInterval = 400;
+ SDL_Texture* menuBackground = graphics.loadTexture("img//run.png");
+// Load hình ảnh xương rồng
+SDL_Texture* obsTexture = graphics.loadTexture("img//obs.png");
 
+TTF_Font* font = TTF_OpenFont("assets//fontpu.ttf", 30); // Đường dẫn đến font chữ
+
+if (!font) {
+    SDL_Log("Failed to load font: %s", TTF_GetError());
+}
+
+
+int score = 0;
+int highest = 0;
+// Vòng lặp chính
 while (!quit) {
+
     while (SDL_PollEvent(&e) != 0) {
         if (e.type == SDL_QUIT) quit = true;
+
+        // Xử lý click trong menu
+        if (gameState == MENU && e.type == SDL_MOUSEBUTTONDOWN) {
+            int x = e.button.x, y = e.button.y;
+            if (x >= START_BUTTON_X && x <= START_BUTTON_X + START_BUTTON_WIDTH &&
+                y >= START_BUTTON_Y && y <= START_BUTTON_Y + START_BUTTON_HEIGHT) {
+                gameState = PLAYING;
+            }
+            if (x >= EXIT_BUTTON_X && x <= EXIT_BUTTON_X + EXIT_BUTTON_WIDTH &&
+                y >= EXIT_BUTTON_Y && y <= EXIT_BUTTON_Y + EXIT_BUTTON_HEIGHT) {
+                gameState = EXIT;
+            }
+        }
+
+        // Xử lý phím nhảy
+        if (gameState == PLAYING) {
+            dino.handleInput(e);
+        }
     }
 
-    const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+    SDL_RenderClear(graphics.renderer);
+
+    if (gameState == MENU) {
+        SDL_RenderCopy(graphics.renderer, menuBackground, NULL, NULL);
+    }
+    else if (gameState == PLAYING) {
+
+    score += 1;  // Hoặc dựa vào điều kiện khác, như vượt qua chướng ngại vật
+
+        graphics.prepareScene();
+
+        background.scroll(9);
+        dino.tick();
 
 
-        if (currentKeyStates[SDL_SCANCODE_UP]) cerr << " Up";
-        if (currentKeyStates[SDL_SCANCODE_DOWN]) cerr << " Down";
-        if (currentKeyStates[SDL_SCANCODE_LEFT]) cerr << " Left";
-        if (currentKeyStates[SDL_SCANCODE_RIGHT]) cerr << " Right";
-        if (currentKeyStates[SDL_SCANCODE_UP]) graphics.play(gJump);
-    background.scroll(8);
-    bird.tick();
+        graphics.render(background);
+        SDL_Rect dinoRect = {200, dino.dinoY, 40, 40};
+        graphics.render(200, dino.dinoY, dino);
+        obstacleManager.render(graphics.renderer);
+
+        obstacleManager.update(obsTexture, dinoRect, gameState, isGameOver);
+
+SDL_Color scoreColor = {75, 0, 130, 255}; // Xanh tím than
+string scoreText = "Score: " + to_string(score);
+graphics.renderText(scoreText.c_str(), 700, 20, scoreColor, font);
+string highScoreText = "Highest: " + to_string(highest);
+graphics.renderText(highScoreText.c_str(), 700, 50, scoreColor,font);
+graphics.presentScene();
 
 
+    }
+    else if (gameState == EXIT) {
+        quit = true;
+    }
+    else if (gameState == END) {
 
-    // Xóa màn hình và vẽ lại
     graphics.prepareScene();
     graphics.render(background);
-    graphics.render(200, 382, bird);
-    //obstacleManager.render(graphics.renderer);
+    graphics.render(200, dino.dinoY, dino);
+    obstacleManager.render(graphics.renderer);
+
+    SDL_Color yellow = {25, 25, 112, 255};
+    graphics.renderText("Press ENTER to replay or ESC to exit", 150, 250, yellow, font);
 
     graphics.presentScene();
 
-    SDL_Delay(100); // Tốc độ khoảng 60 FPS (1000ms / 60 ≈ 16ms)
+    bool waitingForInput = true;
+    while (waitingForInput) {  // Chỉ thoát khi nhận ENTER hoặc ESC
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+                waitingForInput = false;
+            }
+            if (e.type == SDL_KEYDOWN) {
+                std::cout << "Key pressed: " << SDL_GetKeyName(e.key.keysym.sym) << std::endl;
+                if (e.key.keysym.sym == SDLK_RETURN) { // ENTER để chơi lại
+                    isGameOver = false;
+                    gameState = PLAYING;
+                    score = 0;
+                    obstacleManager.clear();
+                    waitingForInput = false;
+                }
+                if (e.key.keysym.sym == SDLK_ESCAPE) { // ESC để thoát
+                    quit = true;
+                    waitingForInput = false;
+                }
+            }
+        }
+    }
+
 }
+if (isGameOver) {
+    if (score > highest) {
+        highest = score; // Lưu điểm cao nhất
+    }
+}
+
+
+graphics.presentScene();
+    SDL_Delay(100);
+}
+
 
  if (gMusic != nullptr) Mix_FreeMusic( gMusic );
     if (gJump != nullptr) Mix_FreeChunk( gJump);
@@ -81,17 +188,17 @@ while (!quit) {
 
 
 // Giải phóng tài nguyên
-SDL_DestroyTexture(enemyTexture);
+SDL_DestroyTexture(obsTexture);
 
 // Giải phóng tài nguyên
-SDL_DestroyTexture(enemyTexture);
+SDL_DestroyTexture(obsTexture);
 
 
 
 
 
     SDL_DestroyTexture( background.texture );
-	SDL_DestroyTexture( birdTexture ); birdTexture = nullptr;
+	SDL_DestroyTexture( dinoTexture ); dinoTexture = nullptr;
 
     graphics.quit();
     return 0;

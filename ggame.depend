@@ -117,20 +117,23 @@
 1742523278 source:d:\btapp\ggame\ltexture.cpp
 	"LTexture.h"
 
-1743356567 source:d:\btapp\ggame\main.cpp
+1743385990 source:d:\btapp\ggame\main.cpp
 	<iostream>
 	<SDL.h>
 	<SDL_image.h>
 	"graphics.h"
 	"defs.h"
 	<SDL_mixer.h>
+	<SDL_ttf.h>
 	<vector>
 
-1742399455 source:d:\btapp\ggame\obs.cpp
+1743379979 source:d:\btapp\ggame\obs.cpp
 	"Obs.h"
 
-1742396513 d:\btapp\ggame\obs.h
+1743379979 d:\btapp\ggame\obs.h
 	<SDL.h>
+	<SDL_image.h>
+	<cstdlib>
 
 1742462139 source:d:\btapp\ggame\test.cpp
 	<SDL.h>
@@ -141,7 +144,7 @@
 	<ctime>
 	<cmath>
 
-1743354377 d:\btapp\ggame\defs.h
+1743381509 d:\btapp\ggame\defs.h
 
 1742571902 d:\btapp\ggame\char.h
 	"GTexture.h"
@@ -150,17 +153,21 @@
 	<SDL.h>
 	<string>
 
-1743217809 source:d:\btapp\ggame\graphics.cpp
+1743358173 source:d:\btapp\ggame\graphics.cpp
 
-1743356756 d:\btapp\ggame\graphics.h
+1743386088 d:\btapp\ggame\graphics.h
 	<SDL.h>
 	<SDL_image.h>
 	"defs.h"
 	<vector>
 	<algorithm>
 	<SDL_mixer.h>
+	<SDL_ttf.h>
 
-1743004531 d:\btapp\ggame\game.h
+1743378599 d:\btapp\ggame\game.h
+	"Obs.h"
+	<vector>
+	"Graphics.h"
 
 1743354140 source:d:\btapp\ggame\obstacle.cpp
 	"obstacle.h"
@@ -173,4 +180,11 @@
 	<string>
 
 1743352975 d:\btapp\ggame\constants.h
+
+1743379628 source:d:\btapp\ggame\game.cpp
+	<iostream>
+	"Game.h"
+	<cstdlib>
+	<SDL_image.h>
+	<algorithm>
 

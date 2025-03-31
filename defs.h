@@ -4,12 +4,26 @@
 const int SCREEN_WIDTH = 1000;
 const int SCREEN_HEIGHT = 520;
 
+const int START_BUTTON_X = 432;
+const int START_BUTTON_Y = 266;
+const int START_BUTTON_WIDTH = 136;
+const int START_BUTTON_HEIGHT = 56;
 
+const int EXIT_BUTTON_X = 21;
+const int EXIT_BUTTON_Y = 13;
+const int EXIT_BUTTON_WIDTH = 54;
+const int EXIT_BUTTON_HEIGHT = 56;
 
+const int OBS_SPEED = 5;
 #define BACKGROUND_IMG "img\\play.png"
+enum GameState {
+    MENU,      // Màn hình chính
+    PLAYING,   // Đang chơi game
+    END, // Kết thúc game
+    EXIT       // Thoát game
+};
 
-
-const int BIRD_CLIPS[][4] = {
+const int DINO_CLIPS[][4] = {
 
 
     {0, 9, 47, 80},
@@ -20,6 +34,6 @@ const int BIRD_CLIPS[][4] = {
 
 
 };
-const int BIRD_FRAMES = sizeof(BIRD_CLIPS)/sizeof(int)/4;
+const int DINO_FRAMES = sizeof(DINO_CLIPS)/sizeof(int)/4;
 
 #endif
