@@ -7,7 +7,29 @@
 #include<algorithm>
 #include<SDL_mixer.h>
 #include<SDL_ttf.h>
-        
+struct Obstacle {
+    SDL_Texture* texture;
+    SDL_Rect rect;
+    int speed;
+
+    Obstacle(SDL_Texture* _texture, int x, int y, int w, int h, int _speed)
+        : texture(_texture), speed(_speed) {
+        rect = {x, y, w, h};
+    }
+
+    void update() {
+        rect.x -= speed;
+    }
+
+    void render(SDL_Renderer* renderer) {
+        SDL_RenderCopy(renderer, texture, nullptr, &rect);
+    }
+
+    bool isOffScreen() const {
+        return rect.x + rect.w < 0;
+    }
+};
+
 class ObstacleManager {
     std::vector<Obstacle> obstacles;
      Uint32 lastSpawnTime = 0;
